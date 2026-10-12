@@ -1,0 +1,39 @@
+from mrjob.job import MRJob
+from mrjob.step import MRStep
+
+class AmisEnCommun(MRJob):
+
+    def steps(self):
+        return [MRStep(mapper=self.mapper,
+                       reducer=self.reducer)]
+
+    def mapper(self, _, line):
+        line = line.strip()
+        if not line:
+            return
+        # Format : "10:20,30,40"
+        user, amis_str = line.split(':')
+        user = int(user)
+        amis = [int(a) for a in amis_str.split(',') if a.strip()]
+
+        # Générer tous les couples (user, ami) avec user < ami
+        for ami in amis:
+            if user < ami:
+                couple = (user, ami)
+            else:
+                couple = (ami, user)
+            # Émettre la liste COMPLÈTE des amis de `user` pour ce couple
+            yield couple, amis
+
+    def reducer(self, couple, listes_amis):
+        # On reçoit exactement 2 listes (une pour chaque utilisateur du couple)
+        listes = list(listes_amis)
+        if len(listes) < 2:
+            yield couple, 0
+            return
+        # Intersection des deux ensembles d'amis
+        communs = set(listes[0]) & set(listes[1])
+        yield couple, len(communs)
+
+if __name__ == '__main__':
+    AmisEnCommun.run()

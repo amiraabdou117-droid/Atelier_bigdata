@@ -1,0 +1,35 @@
+from mrjob.job import MRJob
+from mrjob.step import MRStep
+import re
+
+WORD_RE = re.compile(r"[\w']+")
+
+class WordCountSorted(MRJob):
+
+    def steps(self):
+        return [
+            MRStep(mapper=self.mapper_get_words,
+                   reducer=self.reducer_count_words),
+            MRStep(mapper=self.mapper_swap,
+                   reducer=self.reducer_identity)
+        ]
+
+    # --- Étape 1 : compter les mots ---
+    def mapper_get_words(self, _, line):
+        for word in WORD_RE.findall(line):
+            yield word.lower(), 1
+
+    def reducer_count_words(self, word, counts):
+        yield word, sum(counts)
+
+    # --- Étape 2 : inverser clé/valeur pour trier par nombre ---
+    def mapper_swap(self, word, count):
+        # La clé devient le nombre → tri automatique par nombre croissant
+        yield count, word
+
+    def reducer_identity(self, count, words):
+        for word in words:
+            yield word, count
+
+if __name__ == '__main__':
+    WordCountSorted.run()

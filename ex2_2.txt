@@ -1,0 +1,24 @@
+from mrjob.job import MRJob
+from mrjob.step import MRStep
+
+class TopChampParMois(MRJob):
+
+    def steps(self):
+        return [MRStep(mapper=self.mapper, reducer=self.reducer)]
+
+    def mapper(self, _, line):
+        if line.startswith('champ') or not line.strip():
+            return
+        parts = line.split(',')
+        champ = parts[0]
+        annee, mois = parts[1], parts[2]
+        production = float(parts[3])
+        yield (annee, mois), (production, champ)
+
+    def reducer(self, key, values):
+        # On garde le max de production
+        max_prod, top_champ = max(values, key=lambda x: x[0])
+        yield key, (top_champ, max_prod)
+
+if __name__ == '__main__':
+    TopChampParMois.run()

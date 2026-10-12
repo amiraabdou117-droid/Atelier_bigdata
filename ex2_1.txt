@@ -1,0 +1,23 @@
+from mrjob.job import MRJob
+from mrjob.step import MRStep
+
+class ProductionAnnuelle(MRJob):
+
+    def steps(self):
+        return [MRStep(mapper=self.mapper, reducer=self.reducer)]
+
+    def mapper(self, _, line):
+        # Ignorer l'entête
+        if line.startswith('champ') or not line.strip():
+            return
+        parts = line.split(',')
+        champ = parts[0]
+        annee = parts[1]
+        production = float(parts[3])
+        yield (champ, annee), production
+
+    def reducer(self, key, productions):
+        yield key, sum(productions)
+
+if __name__ == '__main__':
+    ProductionAnnuelle.run()
