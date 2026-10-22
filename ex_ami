@@ -1,0 +1,28 @@
+%%file ex3.py
+from mrjob.step import MRStep
+from mrjob.job import MRJob
+
+class ex3(MRJob):
+    def steps(self):
+        return [MRStep(mapper=self.mapper, reducer=self.reducer)]
+
+    def mapper(self, _, line):
+        T = line.split(":")
+        user = T[0]
+        amis = T[1]
+        for ami in amis.split(","):
+            # Ligne corrigée : bien fermer les parenthèses de max()
+            yield str(min(int(user), int(ami))) + "-" + str(max(int(user), int(ami))), amis
+
+    def reducer(self, key, values):
+        lst = []
+        for v in values:
+            s = set(v.replace(" ", "").split(","))
+            lst.append(s)
+            
+        # Indentation corrigée : aligné avec le "for"
+        if len(lst) > 0:
+            yield key, list(lst[0].intersection(*lst))
+
+if __name__ == '__main__':
+    ex3.run()
