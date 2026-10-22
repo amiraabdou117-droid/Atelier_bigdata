@@ -1,0 +1,12 @@
+%%file books.json
+{"title": "Les Misérables", "pageCount": 1463, "authors": ["Victor Hugo"], "publisher": "A. Lacroix", "year": 1862}
+{"title": "Notre-Dame de Paris", "pageCount": 940, "authors": ["Victor Hugo"], "publisher": "Charles Gosselin", "year": 1831}
+{"title": "Le Petit Prince", "pageCount": 96, "authors": ["Antoine de Saint-Exupéry"], "publisher": "Reynal & Hitchcock", "year": 1943}
+{"title": "L'Étranger", "pageCount": 184, "authors": ["Albert Camus"], "publisher": "Gallimard", "year": 1942}
+{"title": "La Peste", "pageCount": 320, "authors": ["Albert Camus"], "publisher": "Gallimard", "year": 1947}
+{"title": "Harry Potter à l'école des sorciers", "pageCount": 320, "authors": ["J.K. Rowling"], "publisher": "Bloomsbury", "year": 1997}
+{"title": "Harry Potter et la Chambre des secrets", "pageCount": 341, "authors": ["J.K. Rowling"], "publisher": "Bloomsbury", "year": 1998}
+{"title": "Good Omens", "pageCount": 288, "authors": ["Neil Gaiman", "Terry Pratchett"], "publisher": "Gollancz", "year": 1990}
+{"title": "American Gods", "pageCount": 465, "authors": ["Neil Gaiman"], "publisher": "William Morrow", "year": 2001}
+{"title": "1984", "pageCount": 328, "authors": ["George Orwell"], "publisher": "Secker & Warburg", "year": 1949}
+{"title": "La Ferme des animaux", "pageCount": 112, "authors": ["George Orwell"], "publisher": "Secker & Warburg", "year": 1945}
