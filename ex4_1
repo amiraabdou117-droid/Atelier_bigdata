@@ -1,0 +1,26 @@
+%%file ex6.py
+from mrjob.step import MRStep
+from mrjob.job import MRJob
+from mrjob.protocol import JSONValueProtocol
+
+class CompterLivresAuteurs(MRJob):
+    # On indique à MRJob que l'entrée est du JSON
+    INPUT_PROTOCOL = JSONValueProtocol
+
+    def steps(self):
+        return [MRStep(mapper=self.mapper, reducer=self.reducer)]
+
+    def mapper(self, _, book):
+        # 'book' est déjà un dictionnaire Python grâce à JSONValueProtocol
+        # On vérifie si la clé 'authors' existe pour éviter les erreurs
+        if 'authors' in book:
+            for auteur in book['authors']:
+                # On émet (Auteur, 1) pour chaque livre qu'il a écrit
+                yield auteur, 1
+
+    def reducer(self, auteur, counts):
+        # On fait la somme des 1 pour chaque auteur
+        yield auteur, sum(counts)
+
+if __name__ == '__main__':
+    CompterLivresAuteurs.run()
