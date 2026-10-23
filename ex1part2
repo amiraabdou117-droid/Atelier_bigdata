@@ -1,36 +1,34 @@
-%%file wordcount_descending.py
+%%file wordcount_sorted.py
 from mrjob.step import MRStep
 from mrjob.job import MRJob
+import string
 
-class WordCountDescending(MRJob):
+class WordCountSorted(MRJob):
 
     def steps(self):
         return [
-            MRStep(mapper=self.mapper_get_words,
-                   reducer=self.reducer_count_words),
-            MRStep(mapper=self.mapper_swap_negative,
-                   reducer=self.reducer_sort_descending)
+            MRStep(mapper=self.mapper_get_words, reducer=self.reducer_count_words),
+            MRStep(mapper=self.mapper_swap, reducer=self.reducer_sort)
         ]
 
-    # --- Étape 1 : Compter les mots ---
     def mapper_get_words(self, _, line):
         for word in line.split():
-            yield word.lower(), 1
+            # Nettoyage basique pour enlever la ponctuation (comme vu précédemment)
+            clean_word = word.lower().strip(string.punctuation)
+            if clean_word:
+                yield clean_word, 1
 
     def reducer_count_words(self, word, counts):
         yield word, sum(counts)
 
-    # --- Étape 2 : Trier par ordre décroissant ---
-    def mapper_swap_negative(self, word, count):
-        # On inverse clé/valeur ET on met le count en négatif
-        # Ex: ("le", 15) devient (-15, "le")
-        yield -count, word
+    def mapper_swap(self, word, count):
+        # POUR L'ORDRE CROISSANT : yield count, word
+        # POUR L'ORDRE DÉCROISSANT : yield -count, word (le signe moins inverse le tri)
+        yield count, word 
 
-    def reducer_sort_descending(self, negative_count, words):
-        # On reçoit la clé négative et la liste des mots
+    def reducer_sort(self, count, words):
         for word in words:
-            # On remet le count en positif pour l'affichage final
-            yield word, -negative_count
+            yield word, count
 
 if __name__ == '__main__':
-    WordCountDescending.run()
+    WordCountSorted.run()
