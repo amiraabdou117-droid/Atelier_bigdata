@@ -1,0 +1,36 @@
+%%file wordcount_descending.py
+from mrjob.step import MRStep
+from mrjob.job import MRJob
+
+class WordCountDescending(MRJob):
+
+    def steps(self):
+        return [
+            MRStep(mapper=self.mapper_get_words,
+                   reducer=self.reducer_count_words),
+            MRStep(mapper=self.mapper_swap_negative,
+                   reducer=self.reducer_sort_descending)
+        ]
+
+    # --- Étape 1 : Compter les mots ---
+    def mapper_get_words(self, _, line):
+        for word in line.split():
+            yield word.lower(), 1
+
+    def reducer_count_words(self, word, counts):
+        yield word, sum(counts)
+
+    # --- Étape 2 : Trier par ordre décroissant ---
+    def mapper_swap_negative(self, word, count):
+        # On inverse clé/valeur ET on met le count en négatif
+        # Ex: ("le", 15) devient (-15, "le")
+        yield -count, word
+
+    def reducer_sort_descending(self, negative_count, words):
+        # On reçoit la clé négative et la liste des mots
+        for word in words:
+            # On remet le count en positif pour l'affichage final
+            yield word, -negative_count
+
+if __name__ == '__main__':
+    WordCountDescending.run()
