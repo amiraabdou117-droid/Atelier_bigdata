@@ -1,0 +1,14 @@
+group_remb = GROUP credits by loan_status;
+group_credits = GROUP credits ALL;
+
+-- On corrige la faute de frappe : 'totam' devient 'total'
+total = FOREACH group_credits GENERATE group, (double)COUNT(credits) AS total;
+
+counts = FOREACH group_remb GENERATE group, (double)COUNT(credits) AS nbr;
+
+jointure = CROSS total, counts;
+
+-- On utilise les bons préfixes pour éviter l'erreur 1025 (Pig ne sait pas quel 'group' choisir)
+res_q2 = FOREACH jointure GENERATE counts::group AS statut, (counts::nbr / total::total) * 100 AS pourcentage;
+
+dump res_q2;
