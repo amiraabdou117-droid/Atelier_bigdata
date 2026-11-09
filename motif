@@ -1,0 +1,20 @@
+-- a) Nombre de crédits par (Motif + Statut)
+group_motif_remb = GROUP credits BY (loan_intent, loan_status);
+counts_motif = FOREACH group_motif_remb GENERATE group.loan_intent AS motif, group.loan_status AS statut, (double)COUNT(credits) AS nbr;
+
+-- b) Total des crédits par Motif (pour pouvoir diviser)
+group_motif_total = GROUP credits BY loan_intent;
+total_motif = FOREACH group_motif_total GENERATE group AS motif, (double)COUNT(credits) AS total;
+
+-- c) Jointure sur le motif (Attention : ici on utilise JOIN, pas CROSS, car on a plusieurs motifs)
+jointure_motif = JOIN counts_motif BY motif, total_motif BY motif;
+
+-- d) Calcul du pourcentage
+res_q5_motif = FOREACH jointure_motif GENERATE 
+                   counts_motif::motif AS motif, 
+                   counts_motif::statut AS statut, 
+                   (counts_motif::nbr / total_motif::total) * 100 AS pourcentage;
+
+-- e) Tri pour faire joli et affichage
+ordered_motif = ORDER res_q5_motif BY motif, statut;
+dump ordered_motif;
