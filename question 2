@@ -1,0 +1,7 @@
+group_remb = GROUP credits BY loan_status;
+group_credits = GROUP credits ALL;
+total = FOREACH group_credits GENERATE group, (double)COUNT(credits) AS total;
+counts = FOREACH group_remb GENERATE group, (double)COUNT(credits) AS nbr;
+jointure = CROSS total, counts;
+res_q2 = FOREACH jointure GENERATE counts::group AS statut, (counts::nbr / total::total) * 100 AS pourcentage;
+dump res_q2;
