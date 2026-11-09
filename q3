@@ -1,0 +1,10 @@
+-- Q3 : Distribution des états de propriété de la maison
+group_own = GROUP credits BY person_home_ownership;
+
+-- On compte le nombre de crédits pour chaque type de propriété
+count_own = FOREACH group_own GENERATE group AS home_ownership, COUNT(credits) AS nb;
+
+-- On trie pour voir le plus fréquent en premier (comme dans le TP)
+ordered_own = ORDER count_own BY nb DESC;
+
+dump ordered_own;
