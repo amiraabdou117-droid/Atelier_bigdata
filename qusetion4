@@ -1,0 +1,10 @@
+-- Q4 : Les 3 motifs de crédits les plus demandés
+group_intent = GROUP credits BY loan_intent;
+
+-- On compte le nombre de demandes pour chaque motif
+count_intent = FOREACH group_intent GENERATE group AS motif, COUNT(credits) AS nb_demandes;
+
+-- On trie par nombre décroissant et on garde les 3 premiers
+top3 = LIMIT (ORDER count_intent BY nb_demandes DESC) 3;
+
+dump top3;
