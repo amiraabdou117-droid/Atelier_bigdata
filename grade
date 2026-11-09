@@ -1,0 +1,20 @@
+-- a) Nombre de crédits par (Grade + Statut)
+group_grade_remb = GROUP credits BY (loan_grade, loan_status);
+counts_grade = FOREACH group_grade_remb GENERATE group.loan_grade AS grade, group.loan_status AS statut, (double)COUNT(credits) AS nbr;
+
+-- b) Total des crédits par Grade
+group_grade_total = GROUP credits BY loan_grade;
+total_grade = FOREACH group_grade_total GENERATE group AS grade, (double)COUNT(credits) AS total;
+
+-- c) Jointure sur le grade
+jointure_grade = JOIN counts_grade BY grade, total_grade BY grade;
+
+-- d) Calcul du pourcentage
+res_q5_grade = FOREACH jointure_grade GENERATE 
+                   counts_grade::grade AS grade, 
+                   counts_grade::statut AS statut, 
+                   (counts_grade::nbr / total_grade::total) * 100 AS pourcentage;
+
+-- e) Tri pour faire joli et affichage
+ordered_grade = ORDER res_q5_grade BY grade, statut;
+dump ordered_grade;
