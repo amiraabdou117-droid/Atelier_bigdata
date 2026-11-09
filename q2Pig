@@ -1,0 +1,20 @@
+-- 1. Grouper par statut (0 = remboursé, 1 = non remboursé)
+group_remb = GROUP credit_risk BY loan_status;
+
+-- 2. Grouper tout pour avoir le total général
+group_credits = GROUP credit_risk ALL;
+
+-- 3. Calculer le total (Attention: on écrit 'total' et non 'totam')
+total = FOREACH group_credits GENERATE group, (double)COUNT(credit_risk) AS total;
+
+-- 4. Compter le nombre de crédits pour chaque statut
+counts = FOREACH group_remb GENERATE group, (double)COUNT(credit_risk) AS nbr;
+
+-- 5. Faire le produit cartésien (CROSS)
+jointure = CROSS total, counts;
+
+-- 6. Calculer le pourcentage
+res_q2 = FOREACH jointure GENERATE counts::group AS statut, (counts::nbr / total::total) * 100 AS pourcentage;
+
+-- 7. Afficher le résultat
+dump res_q2;
