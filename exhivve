@@ -1,0 +1,6 @@
+SELECT 
+    loan_status,
+    COUNT(*) AS nb_credits,
+    ROUND((COUNT(*) / (SELECT COUNT(*) FROM credits)) * 100, 2) AS pourcentage
+FROM credits
+GROUP BY loan_status;
